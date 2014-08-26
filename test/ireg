@@ -1,0 +1,42 @@
+#!/bin/csh
+
+# ------------------------------------------
+# Launcher for: IREG.
+# ------------------------------------------
+
+if (${#argv} < 1) then
+    echo "Usage: ireg ( start | stop ) <model>"
+    exit 1
+endif
+
+source /opt/ngat/etc/cshrc
+
+source ${DEPLOY_BIN}/class_setup
+source ${DEPLOY_BIN}/x_setup
+
+echo $CLASSPATH 
+
+
+set PID = $DEPLOY_TMP/ireg.pid
+
+
+	echo $$ > $PID
+
+	set EGD = "-Djava.security.egd=file:/dev/urandom"
+	set DEBUG
+
+	set mexit = 0
+
+
+#	${JAVA_HOME}/bin/rmiregistry&
+	
+	
+	$JAVA -DIREG  ngat.icm.test.StartRegistryServer ireg.properties >>&! /occ/tmp/ireg.log &
+
+	set mexit = $status
+	echo "IREG Process exited with status $mexit "
+
+	rm -f $PID
+
+
+endsw

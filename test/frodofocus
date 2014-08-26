@@ -1,0 +1,26 @@
+#!/bin/csh
+
+# source relevant jars
+
+# e.g. ngat_util, ngat_new_icm, ngat_net, ngat_message_base, ngat_meessage_iss_inst
+
+source /opt/ngat/etc/cshrc
+source /occ/bin/class_setup
+
+set HOST = "--host ltsim1"
+set PORT = "--port 7083"
+
+set CONFIG = "--config /home/eng/frodospec.properties"
+
+set REBOOT = "--reboot"
+set RLO = "--redOffsetLow    173.442"
+set RLG = "--redGradientLow  0.03314"
+set RHO = "--redOffsetHigh   173.577"
+set RHG = "--redGradientHigh 0.03178"
+
+set BLO = "--blueOffsetLow    126.6596"
+set BLG = "--blueGradientLow  0.0439637"
+set BHO = "--blueOffsetHigh   126.695"
+set BHG = "--blueGradientHigh 0.040017"
+
+java ngat.icm.test.FrodoFocusReset $HOST $PORT $CONFIG $REBOOT $RLO $RLG $RHO $RHG $BLO $BLG $BHO $BHG
