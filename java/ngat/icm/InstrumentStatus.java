@@ -9,6 +9,7 @@ import java.util.Map;
 
 import ngat.net.telemetry.StatusCategory;
 
+
 /**
  * @author snf
  *
