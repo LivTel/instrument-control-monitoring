@@ -50,6 +50,7 @@
   
   <target name = "compile" depends = "prepare" 
 	  description = "Compile sources">
+	<echo message = "Compiling from ${src.dir} to ${class.dir}"/>
     <javac srcdir  = "${src.dir}" 
            destdir = "${class.dir}"
            source="1.5"
