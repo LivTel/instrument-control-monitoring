@@ -227,7 +227,9 @@ public class BasicInstrument extends UnicastRemoteObject implements InstrumentCo
 		InstrumentStatus mstatus = new InstrumentStatus();
 		mstatus.setInstrument(id);
 		mstatus.setStatusTimeStamp(status.getStatusTimeStamp());
-		if (enabled) {
+		
+		// block to remove for now till we find out the answer to the question below !
+		/*if (enabled) {
 			mstatus.setEnabled(true);
 			mstatus.setOnline(status.isOnline());
 			mstatus.setFunctional(status.isFunctional());
@@ -236,7 +238,16 @@ public class BasicInstrument extends UnicastRemoteObject implements InstrumentCo
 		} else {
 			System.err.println("InstMonitor [" + id.getInstrumentName() + " notify: disabled");
 			mstatus.setEnabled(false);
-		}
+		}*/
+		
+		// new block replacing one above - weird, why would we not update the status elements ?
+		mstatus.setEnabled(enabled);
+		mstatus.setOnline(status.isOnline());
+		mstatus.setFunctional(status.isFunctional());
+		if (status.getStatus() != null)
+			mstatus.setStatus(new HashMap(status.getStatus()));
+		
+		
 		mstatus.setNs(status.getNs());
 		// System.err.println("InstMonitor [" + id.getInstrumentName() +
 		// "]: Purging unresponsive listeners...");
