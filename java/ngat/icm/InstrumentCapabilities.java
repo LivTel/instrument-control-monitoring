@@ -39,8 +39,16 @@ public interface InstrumentCapabilities {
      * @return The target position on this (acquisition) instrument's detector array.
      */
     public DetectorArrayPosition getAcquisitionTargetPosition(InstrumentDescriptor tid) throws UnknownInstrumentException;
-    
-    
+    /**
+	 * Get either the low or high precision acquisition threshold used when this instrument is acquiring onto
+	 * the target instrument specified by tid.
+	 * @param tid The target instrument to retrieve the acquisition threshold for.
+	 * @param high A boolean, if true retrieve the high precision threshold, otherwise retrieve the low precision threshold.
+	 * @return The method returns a double, the specified acquisition threshold in arcseconds.
+	 * @exception UnknownInstrumentException Thrown if an error occurs
+	 */
+    public double getAcquisitionThreshold(InstrumentDescriptor tid,boolean high) throws UnknownInstrumentException;
+
     /**
      * @return The acquisition priority of this instrument (1 = best).
      */

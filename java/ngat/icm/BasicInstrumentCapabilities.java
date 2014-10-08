@@ -24,6 +24,17 @@ public abstract class BasicInstrumentCapabilities implements Serializable, Instr
 	/** Detector array target position for target instrument. */
 	protected Map<InstrumentDescriptor, DetectorArrayPosition> acquisitionTargetPosition;
 
+	/**
+	 * A mapping from InstrumentDescriptor to a double representing the threshold to be
+	 * sent to the acquisition instrument when doing a low precision acquisition.
+	 */
+	protected Map<InstrumentDescriptor,Double> acquisitionLowThreshold;
+	/**
+	 * A mapping from InstrumentDescriptor to a double representing the threshold to be
+	 * sent to the acquisition instrument when doing a high precision acquisition.
+	 */
+	protected Map<InstrumentDescriptor,Double> acquisitionHighThreshold;
+	
 	/** Aperture offset position. */
 	protected FocalPlaneOffset apertureOffset;
 
@@ -144,6 +155,41 @@ public abstract class BasicInstrumentCapabilities implements Serializable, Instr
 		return acquisitionTargetPosition.get(tid);
 	}
 
+	/**
+	 * Get either the low or high precision acquisition threshold used when this instrument is acquiring onto
+	 * the target instrument specified by tid.
+	 * @param tid The target instrument to retrieve the acquisition threshold for.
+	 * @param high A boolean, if true retrieve the high precision threshold, otherwise retrieve the low precision threshold.
+	 * @return The method returns a double, the specified acquisition threshold in arcseconds.
+	 * @see ngat.icm.InstrumentCapabilities#getAcquisitionThreshold()
+	 * @exception UnknownInstrumentException Thrown if tid is null, or the acquisition mapping does not have an entry
+	 * 	          for the specified target instrument.
+	 * @see #acquisitionHighThreshold
+	 * @see #acquisitionLowThreshold
+	 */
+	public double getAcquisitionThreshold(InstrumentDescriptor tid,boolean high)
+			throws UnknownInstrumentException 
+	{
+		if (tid == null)
+			throw new UnknownInstrumentException("No target instrument specified");
+
+		// we only map to the top level instrument as acquire target
+		if (tid.isSubcomponent())
+			tid = tid.getOwner();
+		if(high)
+		{
+			if (!acquisitionHighThreshold.containsKey(tid))
+				throw new UnknownInstrumentException(tid.getInstrumentName());
+			return acquisitionHighThreshold.get(tid);
+		}
+		else
+		{
+			if (!acquisitionLowThreshold.containsKey(tid))
+				throw new UnknownInstrumentException(tid.getInstrumentName());
+			return acquisitionLowThreshold.get(tid);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -247,9 +293,16 @@ public abstract class BasicInstrumentCapabilities implements Serializable, Instr
 					String tgtName = tNode.getAttributeValue("name");
 					double acqx = Double.parseDouble(tNode.getAttributeValue("x"));
 					double acqy = Double.parseDouble(tNode.getAttributeValue("y"));
+					double lowThreshold = Double.parseDouble(tNode.getAttributeValue("lowThreshold"));
+					double highThreshold = Double.parseDouble(tNode.getAttributeValue("highThreshold"));
 					System.err.println("Found acquire offsets for target: " + tgtName + " -> " + acqx + "," + acqy);
-					acquisitionTargetPosition.put(new InstrumentDescriptor(tgtName), new DetectorArrayPosition(acqx,
+					System.err.println("Acquisition thresholds for target: " + tgtName + " low = "+lowThreshold+
+										" high = "+highThreshold);
+					InstrumentDescriptor instrumentDescriptor = new InstrumentDescriptor(tgtName);
+					acquisitionTargetPosition.put(instrumentDescriptor, new DetectorArrayPosition(acqx,
 							acqy));
+					acquisitionLowThreshold.put(instrumentDescriptor,new Double(lowThreshold));
+					acquisitionHighThreshold.put(instrumentDescriptor,new Double(highThreshold));
 				}
 			}
 		}
