@@ -46,7 +46,8 @@ public class CheckAcquire {
 			System.err.println("Checking for DAP using: "+acquireName);
 			DetectorArrayPosition dap = icap.getAcquisitionTargetPosition(acquire);
 			System.err.println("Found DAP: "+dap);
-			
+			double threshold = icap.getAcquisitionThreshold(acquire,false);
+			System.err.println("Found Low Acquisition Threshold: "+threshold);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

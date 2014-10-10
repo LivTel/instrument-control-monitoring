@@ -49,6 +49,7 @@ public class SendAcquireTest {
 		    acq.setAcquisitionMode(TelescopeConfig.ACQUIRE_MODE_BRIGHTEST);
 		    acq.setXPixel(512);
 		    acq.setYPixel(512);
+		    acq.setThreshold(1.2);
 		    acq.setRA(ra);
 		    acq.setDec(dec);
 		    System.err.println("SendAcquireTest: Setting non-sidereal parameters");

@@ -53,10 +53,18 @@ public abstract class BasicInstrumentCapabilities implements Serializable, Instr
 	/** Acquisition priority of this instrument. */
 	protected int acquisitionPriority;
 
-	/** Create a BasicInstrumentCapabilities. */
+	/** 
+	 * Create a BasicInstrumentCapabilities. Create acquisitionTargetPosition / acquisitionLowThreshold / acquisitionHighThreshold
+	 * hashmaps.
+	 * @see #acquisitionTargetPosition
+	 * @see #acquisitionHighThreshold
+	 * @see #acquisitionLowThreshold
+	 */
 	public BasicInstrumentCapabilities() {
 		super();
 		acquisitionTargetPosition = new HashMap<InstrumentDescriptor, DetectorArrayPosition>();
+		acquisitionLowThreshold = new HashMap<InstrumentDescriptor,Double>();
+		acquisitionHighThreshold = new HashMap<InstrumentDescriptor,Double>();
 	}
 
 	/**
