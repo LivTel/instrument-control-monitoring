@@ -207,6 +207,9 @@ public class BasicInstrument extends UnicastRemoteObject implements InstrumentCo
 		} else if (type.equalsIgnoreCase("imagingspectrograph")) {
 			icap = new ImagingSpectrograph();
 			icap.configure(cfgNode);
+		} else if (type.equalsIgnoreCase("bluetwoslitspectrograph")) {
+			icap = new BlueTwoSlitSpectrograph();
+			icap.configure(cfgNode);
 		} else {
 			throw new Exception("Unknown instrument type: " + type);
 		}
