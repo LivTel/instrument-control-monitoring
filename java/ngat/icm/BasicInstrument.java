@@ -201,6 +201,9 @@ public class BasicInstrument extends UnicastRemoteObject implements InstrumentCo
 		} else if (type.equalsIgnoreCase("polarimeter")) {
 			icap = new Polarimeter();
 			icap.configure(cfgNode);
+		} else if (type.equalsIgnoreCase("moptoppolarimeter")) {
+			icap = new MoptopPolarimeter();
+			icap.configure(cfgNode);
 		} else if (type.equalsIgnoreCase("dualbeamspectrograph")) {
 			icap = new DualBeamSpectrograph();
 			icap.configure(cfgNode);

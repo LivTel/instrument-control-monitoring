@@ -113,45 +113,38 @@ public class MoptopPolarimeter extends BasicInstrumentCapabilities
 
 		Map<String, FilterSet> checkWheel = new HashMap<String, FilterSet>(filterWheel);
 		List filterList = filterSpec.getFilterList();
-diddly TODO
 
 		// TODO [2] Another temporary fudge in case the real filterspec has no
 		// filter list.
 		if (filterList == null)
 			filterList = new Vector();
+		// There should be one and one only filter in the list.
+		if(filterList.size() != 1)
+			return false;
 		
-		Iterator iff = filterList.iterator();
-		while (iff.hasNext()) {
+		// get filter def from filter list
+		XFilterDef filterDef = (XFilterDef)filterList.get(0);
+		String filterName = filterDef.getFilterName();
+		FilterDescriptor fd = new FilterDescriptor(filterName, null);
+	
+		boolean filterInAnyWheel = false;
 
-			XFilterDef xfd = (XFilterDef) iff.next();
-			String filterName = xfd.getFilterName();
-
-			// make up a descriptor based on details in the filterspec
-			// we dont have a filter class name at present in the xim.
-			FilterDescriptor fd = new FilterDescriptor(filterName, null);
-
-			boolean filterInAnyWheel = false;
-
-			Iterator<String> iw = checkWheel.keySet().iterator();
-			while (iw.hasNext()) {
-
+		Iterator<String> iw = checkWheel.keySet().iterator();
+		while (iw.hasNext()) 
+		{
 				String fsname = iw.next();
-				FilterSet filterWheel = (FilterSet) filterWheel.get(fsname);
+				FilterSet filterWheelFilterSet = (FilterSet) filterWheel.get(fsname);
 
-				if (filterWheel.containsFilter(fd)) {
+				if (filterWheelFilterSet.containsFilter(fd)) 
+				{
 					filterInAnyWheel = true;
 					break;
 				}
-			}
-			// We've checked the supplied filter in all wheels, was it there ?
-			if (!filterInAnyWheel)
-				return false;
 		}
+		// We've checked the supplied filter in all wheels, was it there ?
+		if (!filterInAnyWheel)
+			return false;
 		// Havnt failed to find any filter in some wheel so should be ok
-		return true;
-		
-diddly
-		
 		return true;
 	}
 	
@@ -179,17 +172,78 @@ diddly
 
 	public Wavelength getWavelength(IInstrumentConfig config)
 	{
-		
-		return new WavelengthNm(348.0);
+
+		System.err.println("MoptopPolarimeter:getWaveLength() using: " + config);
+
+		if (config == null)
+			return new WavelengthNm(500.0);
+
+		// we use the selected filter(s) and extract its central wavelength
+		XMoptopInstrumentConfig moptopConfig = (XMoptopInstrumentConfig) config;
+
+		XFilterSpec filters = moptopConfig.getFilterSpec();
+
+		// TODO [1] A temporary fudge to cope with an moptopConfig with no filterspec
+		if (filters == null)
+			filters = new XFilterSpec();
+
+		List flist = filters.getFilterList();
+
+		if (flist == null)
+			flist = new Vector();
+
+		System.err.println("MoptopPolarimeter:getWaveLength:getWaveLength(): Flist contains: " + flist.size() + " elements");
+
+		if (flist.size() == 1) 
+		{
+			XFilterDef f = (XFilterDef) flist.get(0);
+			System.err.println("MoptopPolarimeter:getWaveLength(): Flist 0: " + f);
+			if (f == null)
+					return new WavelengthNm(500.0);
+			FilterDescriptor fd = new FilterDescriptor(f.getFilterName(), null);
+
+			Iterator<String> iw = filterWheel.keySet().iterator();
+			while (iw.hasNext()) 
+			{
+				String fsname = iw.next();
+				FilterSet fs = filterWheel.get(fsname);
+				if (fs.containsFilter(fd))
+					return fs.getFilter(fd).getCentralWavelength();
+			}
+
+			// its not in the filter wheel apparently
+			return new WavelengthNm(500.0);
+		}
+		// If we don't have only 1 filter guess
+		return new WavelengthNm(500.0);
 	}
 	
 	public void configure(Element cfgNode) throws Exception 
 	{
 		super.configure(cfgNode);
+		System.err.println("MoptopPolarimeter:Configured generics now attempting Moptop-specifics...");
+		// extract filters
+		int nfs = 0;
+		List fsList = cfgNode.getChildren("filterset");
+		Iterator ifs = fsList.iterator();
+		while (ifs.hasNext()) 
+		{
+			Element fsNode = (Element) ifs.next();
+			FilterSet fs = new FilterSet();
+			fs.configure(fsNode);
+			addFilterSet(fs.getName(), fs);
+		}
 	}
 	
 	public String toString() 
 	{
-		return super.toString();
+		StringBuffer buffer = new StringBuffer();
+		Iterator iw = filterWheel.keySet().iterator();
+		while (iw.hasNext()) 
+		{
+			buffer.append("[" + iw + "] " + iw.next());
+		}
+		buffer.append(":").append(super.toString());
+		return buffer.toString();
 	}
 }
